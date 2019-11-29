@@ -18,15 +18,28 @@ public class MethodFinder {
         MethodDeclaration node;
         String methodName;
         int startLineNum;
+        int endLineNum;
 
-        public MethodNode(String methodName, MethodDeclaration node, int startLineNum) {
+        public MethodNode(String methodName, MethodDeclaration node, int startLineNum, int endLineNum) {
             this.methodName = methodName;
             this.node = node;
             this.startLineNum = startLineNum;
+            this.endLineNum = endLineNum;
+        }
+
+        public boolean equals(MethodNode obj) {
+            if (this.node.toString().equals(obj.node.toString())) {
+                return true;
+            }
+            return false;
         }
 
         public int getStartLineNum() {
             return startLineNum;
+        }
+
+        public void setEndLineNum(int endLineNum) {
+            this.endLineNum = endLineNum;
         }
 
         public MethodDeclaration getNode() {
@@ -41,6 +54,7 @@ public class MethodFinder {
         try {
             fileContent = getFileContent(srcFilePath).toCharArray();
         } catch (IOException e) {
+            System.out.printf("getMethodforGivenLineNum-getFileContent failed!\n%s", srcFilePath);
             e.printStackTrace();
             return null;
         }
@@ -58,18 +72,18 @@ public class MethodFinder {
 
                 int startLineNum = cu.getLineNumber(node.getStartPosition());
 
-                methodNodeList.add(new MethodNode(methodName.toString(), node, startLineNum));
+                int endLineNum = cu.getLineNumber(node.getStartPosition() + node.getLength());
+
+                methodNodeList.add(new MethodNode(methodName.toString(), node, startLineNum, endLineNum));
                 return false;
             }
         });
-
-        methodNodeList.sort(Comparator.comparing(a -> a.startLineNum));
 
         MethodNode targetMethod = null;
         for (int i = 0; i < methodNodeList.size(); i++) {
             MethodNode m = methodNodeList.get(i);
             // from begin to the end the first method that
-            if (linenum > m.startLineNum){
+            if (linenum >= m.startLineNum && linenum<=m.endLineNum) {
                 targetMethod = m;
             }
         }
