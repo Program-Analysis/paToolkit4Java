@@ -37,6 +37,10 @@ public class MethodFinder {
         public int getStartLineNum() {
             return startLineNum;
         }
+        
+        public String getMethodName() {
+            return methodName;
+        }
 
         public void setEndLineNum(int endLineNum) {
             this.endLineNum = endLineNum;
@@ -63,7 +67,7 @@ public class MethodFinder {
 
         CompilationUnit cu = (CompilationUnit) parser.createAST(null);
 
-        List<MethodNode> methodNodeList = new ArrayList<>();
+        List<MethodNode> methodNodeList = new ArrayList<MethodNode>();
 
         cu.accept(new ASTVisitor() {
             @Override
