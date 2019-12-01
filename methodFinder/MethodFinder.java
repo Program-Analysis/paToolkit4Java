@@ -1,6 +1,8 @@
 package paToolkit4Java.methodFinder;
 
+import javaToolkit.lib.utils.FileUtil;
 import org.eclipse.jdt.core.dom.*;
+import paToolkit4Java.parser.MethodParser;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -83,12 +85,60 @@ public class MethodFinder {
         for (int i = 0; i < methodNodeList.size(); i++) {
             MethodNode m = methodNodeList.get(i);
             // from begin to the end the first method that
-            if (linenum >= m.startLineNum && linenum<=m.endLineNum) {
+            if (linenum >= m.startLineNum && linenum <= m.endLineNum) {
                 targetMethod = m;
             }
         }
         return targetMethod;
     }
+
+    public String methodReplace(String srcFilePath, String methodStr) {
+        MethodDeclaration transformedMD = MethodParser.parseMethodStr(methodStr);
+        ASTParser srcParser = ASTParser.newParser(AST.JLS8);
+
+        char[] fileContent = null;
+        try {
+            fileContent = getFileContent(srcFilePath).toCharArray();
+        } catch (IOException e) {
+            System.out.printf("getMethodforGivenLineNum-getFileContent failed!\n%s", srcFilePath);
+            e.printStackTrace();
+            return null;
+        }
+
+        srcParser.setSource(fileContent);
+
+        CompilationUnit cu = (CompilationUnit) srcParser.createAST(null);
+
+        List<MethodDeclaration> tarMethodNode = new ArrayList<MethodDeclaration>();
+
+        cu.accept(new ASTVisitor() {
+            @Override
+            public boolean visit(MethodDeclaration node) {
+
+//                System.out.printf("tarMethodNode name %s , %s\n", transformedMD.getName(), node.getName());
+//
+//                System.out.printf("tarMethodNode parameter %s , %s\n", transformedMD.parameters(), node.parameters());
+
+                if (transformedMD.getName().equals(node.getName())) {
+                    tarMethodNode.add(node);
+                }
+                return false;
+            }
+        });
+
+        String srcStr = FileUtil.readFile2Str(srcFilePath);
+        String transformedFileStr = null;
+        if (srcStr.contains(tarMethodNode.toString())) {
+            transformedFileStr = srcStr.replace(tarMethodNode.toString(), methodStr);
+
+        } else {
+            System.out.printf("%s", srcFilePath);
+            System.exit(0);
+        }
+
+        return transformedFileStr;
+    }
+
 
     public static void main(String[] args) {
         MethodFinder mf = new MethodFinder();
