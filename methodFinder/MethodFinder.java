@@ -7,7 +7,6 @@ import paToolkit4Java.parser.MethodParser;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import static javaToolkit.lib.utils.FileUtil.getFileContent;
@@ -179,7 +178,5 @@ public class MethodFinder {
         System.out.println(mn.getNode().toString());
 
     }
-
->>>>>>> 785559304dc56bfe92505a6a7198b027afb5b020
 
 }
