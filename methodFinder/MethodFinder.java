@@ -51,7 +51,7 @@ public class MethodFinder {
 		}
 	}
 
-	public List<MethodDeclaration> getAllMethodforGivenSRCFile(File srcFile) {
+	public static List<MethodDeclaration> getAllMethodforGivenSRCFile(File srcFile) {
 		ASTParser parser = ASTParser.newParser(AST.JLS8);
 
 		char[] fileContent = null;
@@ -81,7 +81,7 @@ public class MethodFinder {
 		return methodNodeList;
 	}
 
-    public MethodNode getMethodforGivenLineNum(String srcFilePath, int linenum) {
+    public static MethodNode getMethodforGivenLineNum(String srcFilePath, int linenum) {
         ASTParser parser = ASTParser.newParser(AST.JLS8);
 
         char[] fileContent = null;
@@ -124,7 +124,7 @@ public class MethodFinder {
         return targetMethod;
     }
 
-    public String methodReplace(String srcFilePath, String methodStr) {
+    public static String methodReplace(String srcFilePath, String methodStr) {
         MethodDeclaration transformedMD = MethodParser.parseMethodStr(methodStr);
         ASTParser srcParser = ASTParser.newParser(AST.JLS8);
 
