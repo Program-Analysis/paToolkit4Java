@@ -15,7 +15,7 @@ public class MethodParser {
 
         String source = sourceStart + methodStr + sourceEnd;
 
-        ASTParser parser = ASTParser.newParser(AST.JLS8);
+        ASTParser parser = ASTParser.newParser(AST.JLS3);
         parser.setSource(source.toCharArray());
         parser.setKind(ASTParser.K_COMPILATION_UNIT);
         CompilationUnit cu = (CompilationUnit) parser.createAST(null);
