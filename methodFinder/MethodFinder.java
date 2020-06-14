@@ -1,11 +1,12 @@
 package paToolkit4Java.methodFinder;
 
 import javaToolkit.lib.utils.FileUtil;
+
 import org.eclipse.jdt.core.dom.*;
 import paToolkit4Java.parser.MethodParser;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,44 +53,14 @@ public class MethodFinder {
 		}
 	}
 
-	public static List<MethodDeclaration> getAllMethodforGivenSRCFile(File srcFile) {
+	public static List<MethodNode> getAllMethodforGivenSRCFile(Path srcFile) {
 		ASTParser parser = ASTParser.newParser(AST.JLS3);
 
 		char[] fileContent = null;
 		try {
-			fileContent = getFileContent(srcFile.getAbsolutePath()).toCharArray();
+			fileContent = getFileContent(srcFile).toCharArray();
 		} catch (IOException e) {
-			System.out.printf("getAllMethodforGivenSRCFile-getFileContent failed!\n%s", srcFile.getAbsolutePath());
-			e.printStackTrace();
-			return null;
-		}
-
-		parser.setSource(fileContent);
-
-		CompilationUnit cu = (CompilationUnit) parser.createAST(null);
-
-		List<MethodDeclaration> methodNodeList = new ArrayList<MethodDeclaration>();
-
-		cu.accept(new ASTVisitor() {
-			@Override
-			public boolean visit(MethodDeclaration node) {
-
-				methodNodeList.add(node);
-				return false;
-			}
-		});
-
-		return methodNodeList;
-	}
-
-	public static MethodNode getMethodforGivenLineNum(String srcFilePath, int linenum) {
-		ASTParser parser = ASTParser.newParser(AST.JLS3);
-
-		char[] fileContent = null;
-		try {
-			fileContent = getFileContent(srcFilePath).toCharArray();
-		} catch (IOException e) {
-			System.out.printf("getMethodforGivenLineNum-getFileContent failed!\n%s", srcFilePath);
+			System.out.printf("getAllMethodforGivenSRCFile-getFileContent failed!\n%s", srcFile.toString());
 			e.printStackTrace();
 			return null;
 		}
@@ -114,6 +85,13 @@ public class MethodFinder {
 			}
 		});
 
+		return methodNodeList;
+	}
+
+	public static MethodNode getMethodforGivenLineNum(Path srcFilePath, int linenum) {
+
+		List<MethodNode> methodNodeList = getAllMethodforGivenSRCFile(srcFilePath);
+
 		MethodNode targetMethod = null;
 		for (int i = 0; i < methodNodeList.size(); i++) {
 			MethodNode m = methodNodeList.get(i);
@@ -125,7 +103,7 @@ public class MethodFinder {
 		return targetMethod;
 	}
 
-	public static String methodReplace(String srcFilePath, String methodStr) {
+	public static String methodReplace(Path srcFilePath, String methodStr) {
 		MethodDeclaration transformedMD = MethodParser.parseMethodStr(methodStr);
 		ASTParser srcParser = ASTParser.newParser(AST.JLS3);
 
@@ -159,7 +137,7 @@ public class MethodFinder {
 			}
 		});
 
-		String srcStr = FileUtil.readFile2Str(Paths.get(srcFilePath));
+		String srcStr = FileUtil.readFile2Str(Paths.get(srcFilePath.toString()));
 		String transformedFileStr = null;
 		if (srcStr.contains(tarMethodNode.toString())) {
 			transformedFileStr = srcStr.replace(tarMethodNode.toString(), methodStr);
